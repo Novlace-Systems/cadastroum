@@ -119,3 +119,28 @@ body {
 .step1 {
   font-weight: bold;
 }
+
+.input-error {
+  border: 2px solid red;
+}
+
+.input-error {
+  border: 2px solid red;
+}
+
+.input-success {
+  border: 2px solid green;
+}
+
+.errorMessage {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.successMessage {
+  color: green;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
