@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Cadastro1.module.css';
+
 
 const Cadastro = () => {
   const [formData, setFormData] = useState({
@@ -13,43 +15,39 @@ const Cadastro = () => {
     confirmeSenha: '',
   });
 
-  if (!nome) newErrors.nome = 'Campo obrigatório';
-    if (!sobrenome) newErrors.sobrenome= 'Campo obrigatório';
-    if (!cpf) newErrors.cpf = 'Campo obrigatório';
-    if (!rg) newErrors.rg = 'Campo obrigatório';
-    if (!dataNascimento) newErrors.dataNascimento = 'Campo obrigatório';
-    if (!email) newErrors.email = 'Campo obrigatório';
-    if (!senha) newErrors.senha = 'Campo obrigatório';
-    if (!confirmeSenha) newErrors.confirmeSenha = 'Campo obrigatório';
+  const [errorFields, setErrorFields] = useState({});
+  const [passwordMismatch, setPasswordMismatch] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    if (Object.keys(newErrors).some((key) => newErrors[key])) {
-      setErrors(newErrors); // Atualizando os erros
-      return;
-    };
+  const navigate = useNavigate();
 
+  // Função para validar apenas letras no nome e sobrenome
   const validateName = (value) => {
     const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]*$/;
     return regex.test(value);
   };
 
+  // Função para formatar CPF no formato: 999.999.999-99
   const formatCPF = (value) => {
-    value = value.replace(/\D/g, '');
-    value = value.slice(0, 11);
-    value = value.replace(/(\d{3})(\d{1,3})/, '$1.$2');
-    value = value.replace(/(\d{3})\.(\d{3})(\d{1,3})/, '$1.$2.$3');
-    value = value.replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+    value = value.replace(/\D/g, ''); // Remove caracteres não numéricos
+    value = value.slice(0, 11); // Limita a 11 dígitos
+    value = value.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona o primeiro ponto
+    value = value.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona o segundo ponto
+    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Adiciona o traço
     return value;
   };
 
+  // Função para formatar RG no formato: 99.999.999-9
   const formatRG = (value) => {
-    value = value.replace(/\D/g, '');
-    value = value.slice(0, 9);
-    value = value.replace(/(\d{2})(\d{1,3})/, '$1.$2');
-    value = value.replace(/(\d{2})\.(\d{3})(\d{1,3})/, '$1.$2.$3');
-    value = value.replace(/(\d{2})\.(\d{3})\.(\d{3})(\d{1,1})/, '$1.$2.$3-$4');
+    value = value.replace(/\D/g, ''); // Remove caracteres não numéricos
+    value = value.slice(0, 9); // Limita a 9 dígitos
+    value = value.replace(/(\d{2})(\d)/, '$1.$2'); // Adiciona o primeiro ponto
+    value = value.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona o segundo ponto
+    value = value.replace(/(\d{3})(\d{1})$/, '$1-$2'); // Adiciona o traço
     return value;
   };
 
+  // Função para lidar com a mudança dos inputs e formatar de acordo com o campo
   const handleInputChange = (field, value) => {
     let updatedValue = value;
 
@@ -70,11 +68,41 @@ const Cadastro = () => {
     }
 
     setFormData({ ...formData, [field]: updatedValue });
+    setErrorFields({ ...errorFields, [field]: false });
 
-    if (field === 'confirmeSenha' || field === 'senha') {
-      const senhasSaoIguais = formData.senha === formData.confirmeSenha;
-      setSenhaDiferente(!senhasSaoIguais && formData.confirmeSenha !== "");
-      setSenhaIgual(senhasSaoIguais && formData.senha.length >= 6 && formData.confirmeSenha.length >= 6);
+    if (field === 'senha' || field === 'confirmeSenha') {
+      setPasswordMismatch('');
+    }
+  };
+
+  const validateForm = () => {
+    const newErrorFields = {};
+    let hasError = false;
+
+    Object.keys(formData).forEach((field) => {
+      if (!formData[field]) {
+        newErrorFields[field] = true;
+        hasError = true;
+      }
+    });
+
+    if (formData.senha !== formData.confirmeSenha) {
+      setPasswordMismatch('As senhas são diferentes.');
+      newErrorFields.confirmeSenha = true;
+      hasError = true;
+    }
+
+    setErrorFields(newErrorFields);
+    return !hasError;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      setLoading(true);
+      setTimeout(() => {
+        navigate('http://localhost:3000/Login');
+      }, 3000);
     }
   };
 
@@ -94,28 +122,30 @@ const Cadastro = () => {
             <span className={styles.step}>Passo 3</span>
           </div>
 
-          <form className={styles.form}>
+          <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.inputRow}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>Nome</label>
                 <input
                   type="text"
-                  className={styles.input}
+                  className={`${styles.input} ${errorFields.nome ? styles.inputError : ''}`}
                   value={formData.nome}
                   onChange={(e) => handleInputChange('nome', e.target.value)}
                   placeholder="Digite seu nome"
                 />
+                {errorFields.nome && <p className={styles.errorMessage}>Campo obrigatório</p>}
               </div>
 
               <div className={styles.inputGroup}>
                 <label className={styles.label}>Sobrenome</label>
                 <input
                   type="text"
-                  className={styles.input}
+                  className={`${styles.input} ${errorFields.sobrenome ? styles.inputError : ''}`}
                   value={formData.sobrenome}
                   onChange={(e) => handleInputChange('sobrenome', e.target.value)}
                   placeholder="Digite seu sobrenome"
                 />
+                {errorFields.sobrenome && <p className={styles.errorMessage}>Campo obrigatório</p>}
               </div>
             </div>
 
@@ -124,22 +154,24 @@ const Cadastro = () => {
                 <label className={styles.label}>CPF</label>
                 <input
                   type="text"
-                  className={styles.input}
+                  className={`${styles.input} ${errorFields.cpf ? styles.inputError : ''}`}
                   value={formData.cpf}
                   onChange={(e) => handleInputChange('cpf', e.target.value)}
                   placeholder="000.000.000-00"
                 />
+                {errorFields.cpf && <p className={styles.errorMessage}>Campo obrigatório</p>}
               </div>
 
               <div className={styles.inputGroup}>
                 <label className={styles.label}>RG</label>
                 <input
                   type="text"
-                  className={styles.input}
+                  className={`${styles.input} ${errorFields.rg ? styles.inputError : ''}`}
                   value={formData.rg}
                   onChange={(e) => handleInputChange('rg', e.target.value)}
                   placeholder="00.000.000-0"
                 />
+                {errorFields.rg && <p className={styles.errorMessage}>Campo obrigatório</p>}
               </div>
             </div>
 
@@ -148,21 +180,23 @@ const Cadastro = () => {
                 <label className={styles.label}>Data de Nascimento</label>
                 <input
                   type="date"
-                  className={styles.input}
+                  className={`${styles.input} ${errorFields.dataNascimento ? styles.inputError : ''}`}
                   value={formData.dataNascimento}
                   onChange={(e) => handleInputChange('dataNascimento', e.target.value)}
                 />
+                {errorFields.dataNascimento && <p className={styles.errorMessage}>Campo obrigatório</p>}
               </div>
 
               <div className={styles.inputGroup}>
                 <label className={styles.label}>Email</label>
                 <input
                   type="email"
-                  className={styles.input}
+                  className={`${styles.input} ${errorFields.email ? styles.inputError : ''}`}
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="Digite seu Email"
                 />
+                {errorFields.email && <p className={styles.errorMessage}>Campo obrigatório</p>}
               </div>
             </div>
 
@@ -171,30 +205,39 @@ const Cadastro = () => {
                 <label className={styles.label}>Senha</label>
                 <input
                   type="password"
-                  className={styles.input}
+                  className={`${styles.input} ${errorFields.senha ? styles.inputError : ''}`}
                   value={formData.senha}
                   onChange={(e) => handleInputChange('senha', e.target.value)}
                   placeholder="Mínimo 6 caracteres"
                 />
+                {errorFields.senha && <p className={styles.errorMessage}>Campo obrigatório</p>}
               </div>
 
               <div className={styles.inputGroup}>
                 <label className={styles.label}>Confirme sua Senha</label>
                 <input
                   type="password"
-                  className={styles.input}
+                  className={`${styles.input} ${errorFields.confirmeSenha ? styles.inputError : ''} ${passwordMismatch ? styles.inputError : ''}`}
                   value={formData.confirmeSenha}
                   onChange={(e) => handleInputChange('confirmeSenha', e.target.value)}
                   placeholder="Confirme sua senha"
                 />
+                {passwordMismatch && <p className={styles.errorMessage}>{passwordMismatch}</p>}
+                {errorFields.confirmeSenha && !passwordMismatch && <p className={styles.errorMessage}>Campo obrigatório</p>}
               </div>
             </div>
+
+            <button type="submit" className={styles.button}>Avançar</button>
           </form>
         </div>
-
-        <a href="http://localhost:3000/Login">
-        <button className={styles.button}>Avançar</button></a>
       </div>
+
+      {loading && (
+        <div className={styles.loadingContainer}>
+          <img src="/abraxoscadastro.png" alt="Dragão fofo" className={styles.dragonImage} />
+          <p className={styles.loadingMessage}>Aguarde, finalizando cadastro...</p>
+        </div>
+      )}
     </div>
   );
 };
