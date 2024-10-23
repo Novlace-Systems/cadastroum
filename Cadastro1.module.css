@@ -9,8 +9,6 @@ body {
   height: 100vh;
 }
 
-
-
 .container {
   width: 100%;
   max-width: 600px;
@@ -18,7 +16,6 @@ body {
   padding: 20px;
   background-color: #e6e7ff;
   border-radius: 10px;
-  width: 100%;
   background-color: transparent;  /* Deixa o contêiner transparente */
 }
 
@@ -86,6 +83,16 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.inputError {
+  border: 1px solid red;
+}
+
+.errorMessage {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
 .button {
   background-color: #4b0082;
   color: white;
@@ -100,7 +107,6 @@ body {
   width: 30%;
   float: right;
 }
-
 
 .stepsContainer {
   display: flex;
@@ -123,16 +129,6 @@ body {
 
 .step1 {
   font-weight: bold;
-}
-
-.errorMessage {
-  color: red;
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-.inputError {
-  border: 1px solid red;
 }
 
 .loadingContainer {
@@ -160,16 +156,3 @@ body {
   margin-top: 10px;
   font-weight: bold;
 }
-.loadingContainer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
