@@ -2,14 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Cadastro1.module.css';
 
-
 const Cadastro = () => {
   const [formData, setFormData] = useState({
     nome: '',
     sobrenome: '',
-    cpf: '',
-    rg: '',
-    dataNascimento: '',
+    usuario: '',
     email: '',
     senha: '',
     confirmeSenha: '',
@@ -27,26 +24,6 @@ const Cadastro = () => {
     return regex.test(value);
   };
 
-  // Função para formatar CPF no formato: 999.999.999-99
-  const formatCPF = (value) => {
-    value = value.replace(/\D/g, ''); // Remove caracteres não numéricos
-    value = value.slice(0, 11); // Limita a 11 dígitos
-    value = value.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona o primeiro ponto
-    value = value.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona o segundo ponto
-    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Adiciona o traço
-    return value;
-  };
-
-  // Função para formatar RG no formato: 99.999.999-9
-  const formatRG = (value) => {
-    value = value.replace(/\D/g, ''); // Remove caracteres não numéricos
-    value = value.slice(0, 9); // Limita a 9 dígitos
-    value = value.replace(/(\d{2})(\d)/, '$1.$2'); // Adiciona o primeiro ponto
-    value = value.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona o segundo ponto
-    value = value.replace(/(\d{3})(\d{1})$/, '$1-$2'); // Adiciona o traço
-    return value;
-  };
-
   // Função para lidar com a mudança dos inputs e formatar de acordo com o campo
   const handleInputChange = (field, value) => {
     let updatedValue = value;
@@ -57,14 +34,6 @@ const Cadastro = () => {
       } else {
         return;
       }
-    }
-
-    if (field === 'cpf') {
-      updatedValue = formatCPF(value);
-    }
-
-    if (field === 'rg') {
-      updatedValue = formatRG(value);
     }
 
     setFormData({ ...formData, [field]: updatedValue });
@@ -151,40 +120,15 @@ const Cadastro = () => {
 
             <div className={styles.inputRow}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>CPF</label>
+                <label className={styles.label}>Nome de Usuário</label>
                 <input
                   type="text"
-                  className={`${styles.input} ${errorFields.cpf ? styles.inputError : ''}`}
-                  value={formData.cpf}
-                  onChange={(e) => handleInputChange('cpf', e.target.value)}
-                  placeholder="000.000.000-00"
+                  className={`${styles.input} ${errorFields.usuario ? styles.inputError : ''}`}
+                  value={formData.usuario}
+                  onChange={(e) => handleInputChange('usuario', e.target.value)}
+                  placeholder="Escolha um nome de usuário"
                 />
-                {errorFields.cpf && <p className={styles.errorMessage}>Campo obrigatório</p>}
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>RG</label>
-                <input
-                  type="text"
-                  className={`${styles.input} ${errorFields.rg ? styles.inputError : ''}`}
-                  value={formData.rg}
-                  onChange={(e) => handleInputChange('rg', e.target.value)}
-                  placeholder="00.000.000-0"
-                />
-                {errorFields.rg && <p className={styles.errorMessage}>Campo obrigatório</p>}
-              </div>
-            </div>
-
-            <div className={styles.inputRow}>
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Data de Nascimento</label>
-                <input
-                  type="date"
-                  className={`${styles.input} ${errorFields.dataNascimento ? styles.inputError : ''}`}
-                  value={formData.dataNascimento}
-                  onChange={(e) => handleInputChange('dataNascimento', e.target.value)}
-                />
-                {errorFields.dataNascimento && <p className={styles.errorMessage}>Campo obrigatório</p>}
+                {errorFields.usuario && <p className={styles.errorMessage}>Campo obrigatório</p>}
               </div>
 
               <div className={styles.inputGroup}>
@@ -235,7 +179,7 @@ const Cadastro = () => {
       {loading && (
         <div className={styles.loadingContainer}>
           <img src="/abraxoscadastro.png" alt="Dragão fofo" className={styles.dragonImage} />
-          <p className={styles.loadingMessage}>Aguarde, finalizando cadastro...</p>
+          <p className={styles.loadingMessage}>Aguarde, estamos processando seus dados...</p>
         </div>
       )}
     </div>
